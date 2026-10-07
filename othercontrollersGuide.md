@@ -113,6 +113,47 @@ send_out(fd, &eps[1], enable, sizeof(enable));
 // Optionally: rumble keepalive every 5s (or controller disconnects from idle)
 ```
 
+### Steam Controller 2 (Wired USB)
+
+The wired Steam Controller 2 (Valve VID `0x28de`, PID `0x1302`) sends a
+native HID state report with report ID `0x42` on the `0x81` interrupt-IN
+endpoint. No output handshake is required for input streaming. The payload
+recognizes the report ID during probing so it is not mistaken for a Nintendo
+Switch controller.
+
+The state report uses little-endian fields after the report ID:
+
+```
+Byte  1: sequence
+Byte  2-5: button bitmask
+Byte  6-7: left trigger (signed 16-bit)
+Byte  8-9: right trigger (signed 16-bit)
+Byte 10-11: left stick X, Byte 12-13: left stick Y
+Byte 14-15: right stick X, Byte 16-17: right stick Y
+Byte 18-19: left trackpad X, Byte 20-21: left trackpad Y
+Byte 22-23: left trackpad pressure
+Byte 24-25: right trackpad X, Byte 26-27: right trackpad Y
+Byte 28-29: right trackpad pressure
+```
+
+The implementation maps the face buttons, bumpers, stick clicks, d-pad,
+Steam/Home, three-line/Share, and two-screen/Options buttons, analog triggers,
+both sticks, and both trackpads into `ScePadData`. Trackpad coordinates are
+scaled to the DualSense touch surface and touch/click state is reported through
+the virtual controller. Each report also updates the virtual pad timestamp and
+report count so games do not treat the input stream as stale. Paddles and IMU
+data are currently ignored. Rumble is not currently supported:
+the payload only receives input reports and has no virtual-device output
+callback from which to obtain PS5 haptic requests.
+
+The wireless Steam Controller 2 puck is experimentally recognized on Valve
+receiver PIDs `0x1304` and `0x1305`. The payload identifies the receiver by
+device descriptor, sends the HID feature report that disables lizard mode,
+and refreshes that setting every three seconds because the receiver has a
+watchdog. Raw `0x42` reports are then parsed through the Steam controller
+path. The puck must already be paired; haptics and wireless slot management
+are not implemented yet.
+
 ### Generic / Unknown
 
 1. Open IN endpoint (no OUT init)

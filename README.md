@@ -41,6 +41,8 @@ https://github.com/user-attachments/assets/6583b1c2-3d3d-4f2e-9e79-689121fea4a3
 |-----------|------|---------|--------|
 | 8BitDo Ultimate 2 | Nintendo Switch Pro | 057e:2009 | ✅ Working |
 | 8BitDo Ultimate 2 | Native | 2dc8:310b | Untested |
+| Steam Controller 2 | Wired USB | 28de:1302 | Supported |
+| Steam Controller 2 puck | Wireless receiver | 28de:1304/1305 | Experimental; lizard-mode disable required |
 
 See `othercontrollersGuide.md` for adding new controllers.
 
